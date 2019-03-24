@@ -13,7 +13,6 @@ import {
   FormikConfig,
   FormikProps
 } from 'formik'
-import { Order } from '../types';
 
 const { Item } = Form
 const { TextArea } = Input
@@ -71,18 +70,6 @@ const EditForm: React.SFC<FormProps> = ({
 }) => (
   <Form
     onSubmit={handleSubmit}
-    // onSubmit={(e: any) => {
-    //   form.validateFieldsAndScroll((err: Error, values: any) => {
-    //     if (err) return
-    //     if (values.depositStatus) {
-    //       values.depositStatus = values.depositStatus.format('YYYY/MM/DD')
-    //     }
-    //     if (values.shipmentStatus) {
-    //       values.shipmentStatus = values.shipmentStatus.format('YYYY/MM/DD')
-    //     }
-    //     console.log(values)
-    //   })
-    // }}
     {...formItemLayout}
   >
     <Item label='購入者名'>
@@ -99,9 +86,6 @@ const EditForm: React.SFC<FormProps> = ({
         rows={3}
         name='products'
         value={values.products}
-        // onChange={(e: React.FormEvent<HTMLTextAreaElement>) => {      
-        //   setFieldValue('products', e.currentTarget.value)
-        // }}
         onChange={handleChange}
       />
     </Item>
@@ -119,7 +103,6 @@ const EditForm: React.SFC<FormProps> = ({
       <DatePicker
         name='depositStatus'
         format='YYYY年MM月DD日'
-        defaultValue={values.depositStatus ? moment(values.depositStatus) : undefined}
         value={values.depositStatus ? moment(values.depositStatus) : undefined}
         onChange={(value) => {
           if (value) {
@@ -130,12 +113,19 @@ const EditForm: React.SFC<FormProps> = ({
         }}
       />
     </Item>
-    {/* <Item label='発送'>
+    <Item label='発送'>
       <DatePicker
         format='YYYY年MM月DD日'
-        value={data.shipmentStatus}
+        value={values.shipmentStatus ? moment(values.shipmentStatus) : undefined}
+        onChange={(value) => {
+          if (value) {
+            setFieldValue('shipmentStatus', value.format('YYYY/MM/DD'))
+          } else {
+            setFieldValue('shipmentStatus', '')
+          }
+        }}
       />
-    </Item> */}
+    </Item>
     <Item label='' {...tailFormItemLayout}>
       <Button
         type='primary'
