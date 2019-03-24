@@ -1,24 +1,24 @@
 import firebase from './'
 import 'firebase/database'
 
-export function set (path: string, data: object) {  
+export const set = (path: string, data: object) => {
   return firebase.database().ref(path).update(data)
 }
 
-export function push (path: string, data: any) {
+export const push = (path: string, data: any) => {
   return firebase.database().ref(path).push(data)
 }
 
-export function read (path: string) {
+export const read = (path: string) => {
   return firebase.database().ref(path).once('value')
 }
 
-export function listenStart (path: string) {
+export const listenStart = (path: string) => {
   return firebase.database().ref(path).on('value', (snapshot: any) => {
     return snapshot.val()
   })
 }
 
-export function remove (path: string) {
+export const remove =  (path: string) => {
   return firebase.database().ref(path).remove()
 }

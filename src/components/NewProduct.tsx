@@ -1,7 +1,5 @@
 import * as React from 'react'
 
-import * as moment from 'moment'
-
 import { set, read } from '../firebase/database'
 
 import {
@@ -61,7 +59,7 @@ const NewProduct = ({ form, match }: any) => (
             }
 
             //get db
-            const products = await read('/products')
+            const products = await read('/orders')
             if (!products.val()) {
               values.id = 'A000'
               values.key = 'A000'
@@ -84,7 +82,7 @@ const NewProduct = ({ form, match }: any) => (
             }
             values.id = `${nextAlph}${nextNum}`
             values.key = `${nextAlph}${nextNum}`
-            set(`products/${nextAlph}${nextNum}`, values)
+            set(`orders/${nextAlph}${nextNum}`, values)
           }
         })
       }}
