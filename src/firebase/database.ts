@@ -13,9 +13,9 @@ export const read = (path: string) => {
   return firebase.database().ref(path).once('value')
 }
 
-export const listenStart = (path: string) => {
-  return firebase.database().ref(path).on('value', (snapshot: any) => {
-    return snapshot.val()
+export const listenStart = (path: string, cb: Function) => {
+  firebase.database().ref(path).on('value', (snapshot: any) => {
+    cb(snapshot.val())
   })
 }
 

@@ -34,6 +34,9 @@ class Print extends React.Component <any> {
         printData[i] = a.slice(i * 6, (i + 1) * 6)
       }
       this.setState({ prints: printData })
+      setTimeout(() => {
+        window.print()
+      }, 1000)
     })
   }
 
