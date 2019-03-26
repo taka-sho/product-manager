@@ -12,10 +12,11 @@ import { stringify } from 'query-string'
 
 import { Order } from '../types'
 import ProductList from '../components/ProductList'
-import { read } from '../firebase/database'
+import { listenStart, read, set } from '../firebase/database'
 
 export type State = {
   dataSource: Order[]
+  sortedData: Order[]
   selectedRowKeys: string[]
   selectedData: Order[]
 }
@@ -25,17 +26,49 @@ export type StateUpdates = {
     selectedRowKeys: string[],
     selectedRowData: []
   ) => Object
+  onChangeFilter: (filterType: string) => Object
 }
 
-const State = withStateHandlers　<State, StateUpdates> (
-  {
-    dataSource: [],
-    selectedRowKeys: [],
-    selectedData: []
+const State = withStateHandlers　<State, {}> (
+  (state) => {
+    console.log(state)
+    // let dataSource: Order[] = []
+    // let sortedData: Order[] = []
+    // read('/oreders')
+    //   .then((snapshot) => {
+    //     const val = snapshot.val()
+    //     Object.keys(val).forEach((key) => {
+    //       dataSource.push(val[key])
+    //     })
+    //   })  
+    return {
+      dataSource: [],
+      sortedData: [],
+      selectedData: [],
+      selectedRowKeys: []
+    }
   },
-  {
-    onChangeSelection: () => (selectedRowKeys, selectedData) => ({ selectedRowKeys, selectedData })
-  }
+  {}
+  // {
+  //   dataSource: [],
+  //   sortedData: [],
+  //   selectedData: [],
+  //   selectedRowKeys: [] 
+  // },
+  // {
+  //   onChangeSelection: () => (selectedRowKeys, selectedData) => ({ selectedRowKeys, selectedData }),
+  //   onChangeFilter: (state) => async (filterType) => {
+  //     console.log(state)
+  //     let dataSource: Order[] = []
+  //     const snapshot = await read('orders/')
+  //     const val = snapshot.val()
+  //     Object.keys(val).forEach((key) => {
+  //       dataSource.push(val[key])
+  //     })
+      
+  //     return { dataSource }
+  //   }
+  // }
 )
 
 type HandlersProps = RouteComponentProps & State
@@ -49,21 +82,36 @@ const Handlers = withHandlers <HandlersProps, {}> ({
   },
   pushToEditPage: ({ history }) => (id: string) => {
     history.push(`product/edit/${id}`)
+  },
+  changeProductStatus: () => (id: string, productStatus: string) => {
+    set(`orders/${id}`, { productStatus })
+  },
+  changeDepositStatus: () => (id: string, depositStatus: string) => {    
+    set(`orders/${id}`, { depositStatus })
+  },
+  onSendProduct: () => (
+    id: string,
+    shipmentNumber: number,
+    shipmentStatus: string
+  ) => {
+    set(`orders/${id}`, { shipmentNumber, shipmentStatus })
+  },
+  done: () => (id: string) => {
+    set(`orders/${id}`, { doneProduct: true })
   }
 })
 
 const LifeCycle = lifecycle <RouteComponentProps, any> ({
   componentDidMount () {
     read('/orders')
-      .then((v: any) => {
-        const db = v.val()
-        let dataSource: any = []
-        Object.keys(db).forEach((key) => {
-          dataSource.push(db[key])
-        })
-        this.setState({ dataSource })
-      })
       .catch(() => this.props.history.push('/'))
+    listenStart('/orders', (val: any) => {
+      let dataSource: any = []
+      Object.keys(val).forEach((key) => {
+        dataSource.push(val[key])
+      })
+      this.setState({ dataSource })
+    })
   }
 })
 

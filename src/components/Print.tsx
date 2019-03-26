@@ -37,6 +37,9 @@ class Print extends React.Component <any> {
       setTimeout(() => {
         window.print()
       }, 1000)
+      window.onafterprint = (e) => {
+        console.log(e)
+      }
     })
   }
 

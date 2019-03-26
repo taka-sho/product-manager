@@ -4,7 +4,8 @@ import {
   Popconfirm,
   Table,
   Tag,
-  Input
+  Input,
+  // Select
 } from 'antd'
 import * as moment from 'moment'
 
@@ -24,7 +25,8 @@ type ActionProps = {
     shipmentNumber: number,
     shipmentStatus: string
   ) => void
-  doneProduct: (id: string) => void
+  done: (id: string) => void
+  onChangeFilter: (filter: string) => void
 }
 
 type Props = ViewProps & ActionProps
@@ -36,15 +38,27 @@ const ProductList: React.SFC <Props> = ({
   selectedRowKeys,
   onChangeSelection,
   onSendProduct,
+  // onChangeFilter,
   changeProductStatus,
   changeDepositStatus,
-  doneProduct
+  done
 }) => (
   <div>
     <Button
       disabled={!selectedRowKeys.length}
       onClick={pushToPrintPage}
-    >送り状印刷</Button>
+    >
+      送り状印刷
+    </Button>
+    {/* <Select
+      style={{ width: '200px' }}
+      defaultValue='all'
+      onChange={onChangeFilter}
+    >
+      <Select.Option value='all' key='0'>All</Select.Option>
+      <Select.Option value='progress' key='1'>Progress</Select.Option>
+      <Select.Option value='done' key='2'>Done</Select.Option>
+    </Select> */}
     <Table
       dataSource={dataSource}
       bordered
@@ -203,7 +217,7 @@ const ProductList: React.SFC <Props> = ({
             (
               <Popconfirm
               title='DONEにしますか'
-              onConfirm={() => doneProduct(id)}
+              onConfirm={() => done(id)}
             >
               <Button type='danger' size='small'>DONE</Button>
             </Popconfirm>
