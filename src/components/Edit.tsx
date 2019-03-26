@@ -1,18 +1,7 @@
 import * as React from 'react'
 import * as moment from 'moment'
-import {
-  Button,
-  DatePicker,
-  Form,
-  Input,
-  Select
-} from 'antd'
-import {
-  Formik,
-  FormikActions,
-  FormikConfig,
-  FormikProps
-} from 'formik'
+import { Button, DatePicker, Form, Input, Select } from 'antd'
+import { Formik, FormikActions, FormikProps } from 'formik'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -21,25 +10,25 @@ const { Option } = Select
 const formItemLayout = {
   labelCol: {
     xs: { span: 24 },
-    sm: { span: 8 }
+    sm: { span: 8 },
   },
   wrapperCol: {
     xs: { span: 24 },
-    sm: { span: 16 }
-  }
+    sm: { span: 16 },
+  },
 }
 
 const tailFormItemLayout = {
   wrapperCol: {
     xs: {
       span: 24,
-      offset: 0
+      offset: 0,
     },
     sm: {
       span: 16,
-      offset: 8
-    }
-  }
+      offset: 8,
+    },
+  },
 }
 
 type FormValues = {
@@ -66,45 +55,48 @@ const EditForm: React.SFC<FormProps> = ({
   handleSubmit,
   handleChange,
   setFieldValue,
-  values
+  values,
 }) => (
-  <Form
-    onSubmit={handleSubmit}
-    {...formItemLayout}
-  >
-    <Item label='購入者名'>
+  <Form onSubmit={handleSubmit} {...formItemLayout}>
+    <Item label="購入者名">
       <Input
-        type='text'
-        placeholder='購入者名を入れてください'
-        name='userName'
+        type="text"
+        placeholder="購入者名を入れてください"
+        name="userName"
         value={values.userName}
         onChange={handleChange}
-      /> 
+      />
     </Item>
-    <Item label='商品内容'>
+    <Item label="商品内容">
       <TextArea
         rows={3}
-        name='products'
+        name="products"
         value={values.products}
         onChange={handleChange}
       />
     </Item>
-    <Item label='商品状態'>
+    <Item label="商品状態">
       <Select
         value={values.productStatus}
         onChange={value => setFieldValue('productStatus', value)}
       >
-        <Option value='0' key='0'>手配中</Option>
-        <Option value='1' key='1'>入荷中</Option>
-        <Option value='2' key='2'>保管中</Option>
+        <Option value="0" key="0">
+          手配中
+        </Option>
+        <Option value="1" key="1">
+          入荷中
+        </Option>
+        <Option value="2" key="2">
+          保管中
+        </Option>
       </Select>
     </Item>
-    <Item label='入金日'>
+    <Item label="入金日">
       <DatePicker
-        name='depositStatus'
-        format='YYYY年MM月DD日'
+        name="depositStatus"
+        format="YYYY年MM月DD日"
         value={values.depositStatus ? moment(values.depositStatus) : undefined}
-        onChange={(value) => {
+        onChange={value => {
           if (value) {
             setFieldValue('depositStatus', value.format('YYYY/MM/DD'))
           } else {
@@ -113,11 +105,13 @@ const EditForm: React.SFC<FormProps> = ({
         }}
       />
     </Item>
-    <Item label='発送'>
+    <Item label="発送">
       <DatePicker
-        format='YYYY年MM月DD日'
-        value={values.shipmentStatus ? moment(values.shipmentStatus) : undefined}
-        onChange={(value) => {
+        format="YYYY年MM月DD日"
+        value={
+          values.shipmentStatus ? moment(values.shipmentStatus) : undefined
+        }
+        onChange={value => {
           if (value) {
             setFieldValue('shipmentStatus', value.format('YYYY/MM/DD'))
           } else {
@@ -126,24 +120,18 @@ const EditForm: React.SFC<FormProps> = ({
         }}
       />
     </Item>
-    <Item label='' {...tailFormItemLayout}>
-      <Button
-        type='primary'
-        htmlType='submit'
-      >
+    <Item label="" {...tailFormItemLayout}>
+      <Button type="primary" htmlType="submit">
         変更
       </Button>
     </Item>
   </Form>
 )
 
-const Edit: React.SFC<Props> = ({
-  initialValues,
-  onSubmit
-}) => (
+const Edit: React.SFC<Props> = ({ initialValues, onSubmit }) => (
   <Formik
     initialValues={initialValues}
-    enableReinitialize
+    enableReinitialize={true}
     onSubmit={onSubmit}
     render={EditForm}
   />

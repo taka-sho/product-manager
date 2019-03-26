@@ -1,13 +1,5 @@
-import {
-  compose,
-  lifecycle,
-  withHandlers,
-  withStateHandlers
-} from 'recompose'
-import {
-  RouteComponentProps,
-  withRouter
-} from 'react-router-dom'
+import { compose, lifecycle, withHandlers, withStateHandlers } from 'recompose'
+import { RouteComponentProps, withRouter } from 'react-router-dom'
 import { stringify } from 'query-string'
 
 import { Order } from '../types'
@@ -22,16 +14,12 @@ export type State = {
 }
 
 export type StateUpdates = {
-  onChangeSelection: (
-    selectedRowKeys: string[],
-    selectedRowData: []
-  ) => Object
+  onChangeSelection: (selectedRowKeys: string[], selectedRowData: []) => Object
   onChangeFilter: (filterType: string) => Object
 }
 
-const State = withStateHandlers　<State, {}> (
-  (state) => {
-    console.log(state)
+const State = withStateHandlers<State, {}>(
+  state => {
     // let dataSource: Order[] = []
     // let sortedData: Order[] = []
     // read('/oreders')
@@ -40,12 +28,12 @@ const State = withStateHandlers　<State, {}> (
     //     Object.keys(val).forEach((key) => {
     //       dataSource.push(val[key])
     //     })
-    //   })  
+    //   })
     return {
       dataSource: [],
       sortedData: [],
       selectedData: [],
-      selectedRowKeys: []
+      selectedRowKeys: [],
     }
   },
   {}
@@ -53,7 +41,7 @@ const State = withStateHandlers　<State, {}> (
   //   dataSource: [],
   //   sortedData: [],
   //   selectedData: [],
-  //   selectedRowKeys: [] 
+  //   selectedRowKeys: []
   // },
   // {
   //   onChangeSelection: () => (selectedRowKeys, selectedData) => ({ selectedRowKeys, selectedData }),
@@ -65,7 +53,7 @@ const State = withStateHandlers　<State, {}> (
   //     Object.keys(val).forEach((key) => {
   //       dataSource.push(val[key])
   //     })
-      
+
   //     return { dataSource }
   //   }
   // }
@@ -73,11 +61,11 @@ const State = withStateHandlers　<State, {}> (
 
 type HandlersProps = RouteComponentProps & State
 
-const Handlers = withHandlers <HandlersProps, {}> ({
+const Handlers = withHandlers<HandlersProps, {}>({
   pushToPrintPage: ({ history, selectedRowKeys }) => () => {
     history.push({
       pathname: '/print',
-      search: stringify({ productKeys: selectedRowKeys })
+      search: stringify({ productKeys: selectedRowKeys }),
     })
   },
   pushToEditPage: ({ history }) => (id: string) => {
@@ -86,7 +74,7 @@ const Handlers = withHandlers <HandlersProps, {}> ({
   changeProductStatus: () => (id: string, productStatus: string) => {
     set(`orders/${id}`, { productStatus })
   },
-  changeDepositStatus: () => (id: string, depositStatus: string) => {    
+  changeDepositStatus: () => (id: string, depositStatus: string) => {
     set(`orders/${id}`, { depositStatus })
   },
   onSendProduct: () => (
@@ -98,28 +86,27 @@ const Handlers = withHandlers <HandlersProps, {}> ({
   },
   done: () => (id: string) => {
     set(`orders/${id}`, { doneProduct: true })
-  }
+  },
 })
 
-const LifeCycle = lifecycle <RouteComponentProps, any> ({
-  componentDidMount () {
-    read('/orders')
-      .catch(() => this.props.history.push('/'))
+const LifeCycle = lifecycle<RouteComponentProps, any>({
+  componentDidMount() {
+    read('/orders').catch(() => this.props.history.push('/'))
     listenStart('/orders', (val: any) => {
       let dataSource: any = []
-      Object.keys(val).forEach((key) => {
+      Object.keys(val).forEach(key => {
         dataSource.push(val[key])
       })
       this.setState({ dataSource })
     })
-  }
+  },
 })
 
 const Wrapper = compose(
-    State,
-    LifeCycle,
-    Handlers,
-    withRouter
-  )(ProductList)
+  State,
+  LifeCycle,
+  Handlers,
+  withRouter
+)(ProductList)
 
 export default Wrapper

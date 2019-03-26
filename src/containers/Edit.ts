@@ -1,13 +1,5 @@
-import {
-  compose,
-  lifecycle,
-  withHandlers,
-  withStateHandlers
-} from 'recompose'
-import {
-  RouteComponentProps,
-  withRouter
-} from 'react-router-dom'
+import { compose, lifecycle, withHandlers, withStateHandlers } from 'recompose'
+import { RouteComponentProps, withRouter } from 'react-router-dom'
 
 import { Order } from '../types'
 
@@ -21,7 +13,7 @@ export type State = {
 
 export type StateUpdates = {}
 
-const State = withStateHandlers <State, StateUpdates> (
+const State = withStateHandlers<State, StateUpdates>(
   ({ match }: any) => ({
     id: match.params.id,
     initialValues: {
@@ -32,13 +24,17 @@ const State = withStateHandlers <State, StateUpdates> (
       depositStatus: '',
       shipmentStatus: '',
       shipmentMail: '',
-      key: ''
-    }
+      key: '',
+    },
   }),
   {
-    onChangeProductStatus: () => (
-      { key, value }: { key: string, value: string }
-    ) => ({ [key]: value })
+    onChangeProductStatus: () => ({
+      key,
+      value,
+    }: {
+      key: string
+      value: string
+    }) => ({ [key]: value }),
   }
 )
 
@@ -50,42 +46,39 @@ type FormValues = {
   shipmentStatus: string
 }
 
-const Handlers = withHandlers <RouteComponentProps&any, {}> ({
-  onSubmit: (props) => (values: FormValues) => {
-    const splitedValue = values.products.split('\n').map((v) => v.split('：'))
+const Handlers = withHandlers<RouteComponentProps & any, {}>({
+  onSubmit: props => (values: FormValues) => {
+    const splitedValue = values.products.split('\n').map(v => v.split('：'))
     let productsValue: Order['products'] = {}
-    splitedValue.forEach((v) => {
+    splitedValue.forEach(v => {
       productsValue[v[0]] = v[1]
     })
     delete productsValue['']
     values.products = productsValue
-    
-    set(`orders/${props.id}`, values)
-      .then(() => {
-        props.history.push('/products')
-      })
-  }
+
+    set(`orders/${props.id}`, values).then(() => {
+      props.history.push('/products')
+    })
+  },
 })
 
-const LifeCycle = lifecycle <RouteComponentProps, {} > ({
-  componentDidMount () {
+const LifeCycle = lifecycle<RouteComponentProps, {}>({
+  componentDidMount() {
     const { id }: any = this.props.match.params
-    console.log(id)
     this.setState({ id })
     read(`orders/${id}`)
       .then((v: any) => {
         const initialValues = v.val()
         let products: Order['products'] = ''
-        Object.keys(initialValues.products).forEach((key) => {
+        Object.keys(initialValues.products).forEach(key => {
           products += `${key}：${initialValues.products[key]}\n`
         })
         initialValues.products = products
-        console.log(initialValues)
-        
+
         this.setState({ initialValues })
       })
       .catch(() => this.props.history.push('/'))
-  }
+  },
 })
 
 const Wrapper = compose(

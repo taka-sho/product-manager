@@ -1,5 +1,1 @@
-import {
-  compose,
-  lifecycle,
-  withStateHandlers
-} from 'recompose'
+import { compose, lifecycle, withStateHandlers } from 'recompose'

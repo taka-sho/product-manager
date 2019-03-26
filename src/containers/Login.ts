@@ -1,12 +1,5 @@
-import {
-  compose,
-  withHandlers,
-  withStateHandlers
-} from 'recompose'
-import {
-  RouteComponentProps,
-  withRouter
-} from 'react-router-dom'
+import { compose, withHandlers, withStateHandlers } from 'recompose'
+import { RouteComponentProps, withRouter } from 'react-router-dom'
 
 import Login from '../components/Login'
 import { signIn } from '../firebase/auth'
@@ -16,28 +9,22 @@ export type State = {
   pass: string
 }
 
-const Handlers = withHandlers <RouteComponentProps & State, {}> ({
+const Handlers = withHandlers<RouteComponentProps & State, {}>({
   signIn: ({ email, pass, history }) => () => {
-    signIn(email, pass)
-      .then(() => {
-        history.push('/products')
-      })
-      .catch((e) => {
-        console.log(e)
-      })
-  }
+    signIn(email, pass).then(() => {
+      history.push('/products')
+    })
+  },
 })
 
 export type StateUpdates = {
-  onChangeState: (
-    { key, value }:  {key: string, value: string }
-  ) => Object
+  onChangeState: ({ key, value }: { key: string; value: string }) => Object
 }
 
 const StateHandlers = withStateHandlers<State, StateUpdates>(
   { email: '', pass: '' },
   {
-    onChangeState: () => ({key, value}) => ({ [key]: value })
+    onChangeState: () => ({ key, value }) => ({ [key]: value }),
   }
 )
 

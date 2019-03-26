@@ -69,7 +69,7 @@
     "dev": "run-p dev:*",
     "dev:pug": "pug src/index.pug -o dist -w",
     "dev:webpack": "webpack-dev-server --content-base ./dist",
-    "lint": "tslint 'src/**/*.ts{,x}'",
+    "lint": "tslint 'src/**/*.ts{,x}' --fix",
     "prebuild": "rimraf dist",
     "predev": "yarn run build"
   }

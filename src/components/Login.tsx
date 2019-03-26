@@ -1,10 +1,5 @@
 import * as React from 'react'
-import {
-  Button,
-  Form,
-  Icon,
-  Input
-} from 'antd'
+import { Button, Form, Icon, Input } from 'antd'
 
 import { State, StateUpdates } from '../containers/Login'
 
@@ -16,21 +11,11 @@ type ActionProps = {
 
 type Props = ViewProps & ActionProps
 
-const Login: React.SFC<Props> = ({
-  email,
-  pass,
-  onChangeState,
-  signIn
-}) => (
+const Login: React.SFC<Props> = ({ email, pass, onChangeState, signIn }) => (
   <Form layout="inline">
     <Form.Item>
       <Input
-        prefix={
-          <Icon
-            type="user"
-            style={{ color: 'rgba(0,0,0,.25)' }}
-          />
-        }
+        prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
         value={email}
         onChange={(e: React.FormEvent<HTMLInputElement>) => {
           if (e.target instanceof HTMLInputElement) {
@@ -42,12 +27,7 @@ const Login: React.SFC<Props> = ({
     </Form.Item>
     <Form.Item>
       <Input
-        prefix={
-          <Icon
-            type="lock"
-            style={{ color: 'rgba(0,0,0,.25)' }}
-          />
-        }
+        prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
         value={pass}
         onChange={(e: React.FormEvent<HTMLInputElement>) => {
           if (e.target instanceof HTMLInputElement) {
@@ -59,10 +39,7 @@ const Login: React.SFC<Props> = ({
       />
     </Form.Item>
     <Form.Item>
-      <Button
-        type="primary"
-        onClick={signIn}
-      >
+      <Button type="primary" onClick={signIn}>
         Log in
       </Button>
     </Form.Item>
