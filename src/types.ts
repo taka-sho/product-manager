@@ -7,4 +7,5 @@ export type Order = {
   shipmentStatus: string
   shipmentMail: string
   key: string
+  doneProduct: boolean
 }

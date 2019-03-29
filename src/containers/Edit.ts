@@ -25,6 +25,7 @@ const State = withStateHandlers<State, StateUpdates>(
       shipmentStatus: '',
       shipmentMail: '',
       key: '',
+      doneProduct: false,
     },
   }),
   {

@@ -20,7 +20,7 @@ class Print extends React.Component<any> {
       productKeys = [productKeys]
     }
 
-    productKeys.forEach(async (productKey: string, i: number) => {
+    productKeys.forEach(async (productKey: string) => {
       const d = await read(`orders/${productKey}`)
       const { address, userName, id } = d.val()
       const addressNumber = address.slice(1, 9).replace(/-/g, '')

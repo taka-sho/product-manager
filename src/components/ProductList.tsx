@@ -1,12 +1,5 @@
 import * as React from 'react'
-import {
-  Button,
-  Popconfirm,
-  Table,
-  Tag,
-  Input,
-  // Select
-} from 'antd'
+import { Button, Popconfirm, Table, Tag, Input, message, Select } from 'antd'
 import * as moment from 'moment'
 
 const { Column } = Table
@@ -31,14 +24,16 @@ type ActionProps = {
 
 type Props = ViewProps & ActionProps
 
-const ProductList: React.SFC<Props> = ({
+const ProductList: React.SFC<any> = ({
+  current,
   pushToEditPage,
   pushToPrintPage,
   dataSource,
   selectedRowKeys,
   onChangeSelection,
+  onChangePatigation,
   onSendProduct,
-  // onChangeFilter,
+  onChangeFilter,
   changeProductStatus,
   changeDepositStatus,
   done,
@@ -47,15 +42,21 @@ const ProductList: React.SFC<Props> = ({
     <Button disabled={!selectedRowKeys.length} onClick={pushToPrintPage}>
       送り状印刷
     </Button>
-    {/* <Select
+    <Select
       style={{ width: '200px' }}
-      defaultValue='all'
+      defaultValue="all"
       onChange={onChangeFilter}
     >
-      <Select.Option value='all' key='0'>All</Select.Option>
-      <Select.Option value='progress' key='1'>Progress</Select.Option>
-      <Select.Option value='done' key='2'>Done</Select.Option>
-    </Select> */}
+      <Select.Option value="all" key="0">
+        All
+      </Select.Option>
+      <Select.Option value="progress" key="1">
+        Progress
+      </Select.Option>
+      <Select.Option value="done" key="2">
+        Done
+      </Select.Option>
+    </Select>
     <Table
       dataSource={dataSource}
       bordered={true}
@@ -66,6 +67,8 @@ const ProductList: React.SFC<Props> = ({
           disabled: productStatus === '0' || !depositStatus,
         }),
       }}
+      pagination={{ current }}
+      onChange={onChangePatigation}
     >
       <Column title="注文ID" dataIndex="id" key="id" align="center" />
       <Column title="購入者名" dataIndex="userName" key="userName" />
@@ -191,6 +194,8 @@ const ProductList: React.SFC<Props> = ({
                       Number(num),
                       moment().format('YYYY/MM/DD')
                     )
+                  } else {
+                    message.error('12桁の半角の数字を打ち込んでください')
                   }
                 }}
               />

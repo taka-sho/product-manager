@@ -12,7 +12,7 @@ export type State = {
 const Handlers = withHandlers<RouteComponentProps & State, {}>({
   signIn: ({ email, pass, history }) => () => {
     signIn(email, pass).then(() => {
-      history.push('/products')
+      history.push('/products/1')
     })
   },
 })

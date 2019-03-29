@@ -7,8 +7,9 @@ import ProductList from '../components/ProductList'
 import { listenStart, read, set } from '../firebase/database'
 
 export type State = {
+  allData: Order[]
+  current: number
   dataSource: Order[]
-  sortedData: Order[]
   selectedRowKeys: string[]
   selectedData: Order[]
 }
@@ -16,50 +17,50 @@ export type State = {
 export type StateUpdates = {
   onChangeSelection: (selectedRowKeys: string[], selectedRowData: []) => Object
   onChangeFilter: (filterType: string) => Object
+  changeCurrentPage: (current: number) => Object
+  reciveData: (dataSource: Order[]) => Object
 }
 
-const State = withStateHandlers<State, {}>(
-  state => {
-    // let dataSource: Order[] = []
-    // let sortedData: Order[] = []
-    // read('/oreders')
-    //   .then((snapshot) => {
-    //     const val = snapshot.val()
-    //     Object.keys(val).forEach((key) => {
-    //       dataSource.push(val[key])
-    //     })
-    //   })
-    return {
-      dataSource: [],
-      sortedData: [],
-      selectedData: [],
-      selectedRowKeys: [],
-    }
+const State = withStateHandlers<State, StateUpdates>(
+  {
+    allData: [],
+    current: 1,
+    dataSource: [],
+    selectedData: [],
+    selectedRowKeys: [],
   },
-  {}
-  // {
-  //   dataSource: [],
-  //   sortedData: [],
-  //   selectedData: [],
-  //   selectedRowKeys: []
-  // },
-  // {
-  //   onChangeSelection: () => (selectedRowKeys, selectedData) => ({ selectedRowKeys, selectedData }),
-  //   onChangeFilter: (state) => async (filterType) => {
-  //     console.log(state)
-  //     let dataSource: Order[] = []
-  //     const snapshot = await read('orders/')
-  //     const val = snapshot.val()
-  //     Object.keys(val).forEach((key) => {
-  //       dataSource.push(val[key])
-  //     })
-
-  //     return { dataSource }
-  //   }
-  // }
+  {
+    onChangeSelection: () => (selectedRowKeys: any, selectedData: any) => ({
+      selectedRowKeys,
+      selectedData,
+    }),
+    onChangeFilter: ({ allData }) => (filterType: string) => {
+      switch (filterType) {
+        case 'all':
+          return { dataSource: allData }
+        case 'done':
+          const done = allData
+            .map((v: any) => (v.doneProduct ? v : null))
+            .filter((v: any) => v)
+          return { dataSource: done }
+        case 'progress':
+          const progress = allData
+            .map((v: any) => (!v.doneProduct ? v : null))
+            .filter((v: any) => v)
+          return { dataSource: progress }
+        default:
+          return { dataSource: [] }
+      }
+    },
+    reciveData: () => (dataSource: Order[]) => ({
+      allData: dataSource,
+      dataSource,
+    }),
+    changeCurrentPage: () => current => ({ current }),
+  }
 )
 
-type HandlersProps = RouteComponentProps & State
+type HandlersProps = RouteComponentProps & State & StateUpdates
 
 const Handlers = withHandlers<HandlersProps, {}>({
   pushToPrintPage: ({ history, selectedRowKeys }) => () => {
@@ -87,26 +88,35 @@ const Handlers = withHandlers<HandlersProps, {}>({
   done: () => (id: string) => {
     set(`orders/${id}`, { doneProduct: true })
   },
-})
-
-const LifeCycle = lifecycle<RouteComponentProps, any>({
-  componentDidMount() {
-    read('/orders').catch(() => this.props.history.push('/'))
+  fetchData: ({ reciveData }: any) => () => {
     listenStart('/orders', (val: any) => {
       let dataSource: any = []
       Object.keys(val).forEach(key => {
         dataSource.push(val[key])
       })
-      this.setState({ dataSource })
+      reciveData(dataSource)
     })
+  },
+  onChangePatigation: ({ history, changeCurrentPage }) => ({
+    current,
+  }: any) => {
+    history.push(`/products/${current}`)
+    changeCurrentPage(current)
+  },
+})
+
+const LifeCycle = lifecycle<RouteComponentProps, any, any>({
+  componentDidMount() {
+    read('/orders').catch(() => this.props.history.push('/'))
+    this.props.fetchData()
   },
 })
 
 const Wrapper = compose(
+  withRouter,
   State,
-  LifeCycle,
   Handlers,
-  withRouter
+  LifeCycle
 )(ProductList)
 
 export default Wrapper
