@@ -58,7 +58,7 @@ const Handlers = withHandlers<RouteComponentProps & any, {}>({
     values.products = productsValue
 
     set(`orders/${props.id}`, values).then(() => {
-      props.history.push('/products')
+      props.history.push('/products/1')
     })
   },
 })

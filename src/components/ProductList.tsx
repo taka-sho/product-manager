@@ -1,5 +1,15 @@
 import * as React from 'react'
-import { Button, Popconfirm, Table, Tag, Input, message, Select } from 'antd'
+import {
+  Button,
+  Popconfirm,
+  Table,
+  Tag,
+  Icon,
+  Input,
+  message,
+  Select,
+  Spin,
+} from 'antd'
 import * as moment from 'moment'
 
 const { Column } = Table
@@ -30,15 +40,17 @@ const ProductList: React.SFC<any> = ({
   pushToPrintPage,
   dataSource,
   selectedRowKeys,
+  isLoading,
   onChangeSelection,
   onChangePatigation,
   onSendProduct,
+  onSendWarningMessage,
   onChangeFilter,
   changeProductStatus,
   changeDepositStatus,
   done,
 }) => (
-  <div>
+  <Spin spinning={isLoading} tip="読み込み中">
     <Button disabled={!selectedRowKeys.length} onClick={pushToPrintPage}>
       送り状印刷
     </Button>
@@ -110,6 +122,7 @@ const ProductList: React.SFC<any> = ({
           }
         }}
       />
+      <Column title="合計金額" dataIndex="price" key="price" align="center" />
       <Column
         title="商品状態"
         key="productStatus"
@@ -133,26 +146,56 @@ const ProductList: React.SFC<any> = ({
       <Column
         title="入金確認"
         key="depositStatus"
-        render={({ depositStatus, mail, userName, id }: any): any => {
+        render={({
+          depositStatus,
+          mail,
+          userName,
+          id,
+          address,
+          orderDate,
+          products,
+          price,
+        }: any): any => {
           if (!depositStatus) {
             return (
               <div>
                 <Popconfirm
-                  title="手配済みにしますか？"
-                  onConfirm={() =>
-                    changeDepositStatus(id, moment().format('YYYY/MM/DD'))
-                  }
+                  title={`${userName}様(${mail})に入金確認完了のメールを送りますか？`}
+                  onConfirm={() => {
+                    changeDepositStatus(
+                      id,
+                      moment().format('YYYY/MM/DD'),
+                      mail,
+                      address,
+                      userName,
+                      orderDate,
+                      products,
+                      price
+                    )
+                  }}
                 >
-                  <Tag color="#f50">未入金</Tag>
+                  <Tag color="#f50">
+                    未入金{moment().diff(orderDate, 'days')}日
+                  </Tag>
                 </Popconfirm>
                 <Popconfirm
-                  title={`${userName}様に入金を催促するメールを送りますか？`}
-                  onConfirm={() =>
-                    window.open(
-                      `https://mail.google.com/mail/?view=cm&to=${mail}&su=入金のお願い&body=入金されていません．`,
-                      '_blank'
+                  title={`${userName}様(${mail})に入金を催促するメールを送りますか？`}
+                  onConfirm={() => {
+                    onSendWarningMessage(
+                      id,
+                      moment().format('YYYY/MM/DD'),
+                      mail,
+                      address,
+                      userName,
+                      orderDate,
+                      products,
+                      price
                     )
-                  }
+                    // window.open(
+                    //   `https://mail.google.com/mail/?view=cm&to=${mail}&su=入金のお願い&body=入金されていません．`,
+                    //   '_blank'
+                    // )
+                  }}
                 >
                   <Button size="small" type="danger">
                     催促
@@ -168,7 +211,17 @@ const ProductList: React.SFC<any> = ({
       <Column
         title="発送"
         key="shipmentStatus"
-        render={({ id, shipmentStatus, shipmentNumber }): any => {
+        render={({
+          id,
+          shipmentStatus,
+          shipmentNumber,
+          mail,
+          userName,
+          address,
+          products,
+          orderDate,
+          price,
+        }): any => {
           if (shipmentNumber && shipmentStatus) {
             shipmentNumber = String(shipmentNumber)
             const displayShipmentNumber = `${shipmentNumber.slice(
@@ -185,15 +238,21 @@ const ProductList: React.SFC<any> = ({
             return (
               <Input.Search
                 placeholder="input search text"
-                enterButton="発送"
+                enterButton="出荷"
                 size="small"
                 onSearch={(num: string) => {
                   if (typeof num && num.length === 12) {
-                    onSendProduct(
+                    onSendProduct({
                       id,
-                      Number(num),
-                      moment().format('YYYY/MM/DD')
-                    )
+                      shipmentNumber: Number(num),
+                      shipmentStatus: moment().format('YYYY/MM/DD'),
+                      mail,
+                      userName,
+                      address,
+                      products,
+                      orderDate,
+                      price,
+                    })
                   } else {
                     message.error('12桁の半角の数字を打ち込んでください')
                   }
@@ -228,7 +287,7 @@ const ProductList: React.SFC<any> = ({
         }
       />
     </Table>
-  </div>
+  </Spin>
 )
 
 export default ProductList

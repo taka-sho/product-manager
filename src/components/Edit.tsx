@@ -86,9 +86,6 @@ const EditForm: React.SFC<FormProps> = ({
         <Option value="1" key="1">
           入荷中
         </Option>
-        <Option value="2" key="2">
-          保管中
-        </Option>
       </Select>
     </Item>
     <Item label="入金日">

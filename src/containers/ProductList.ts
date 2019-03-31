@@ -1,6 +1,7 @@
 import { compose, lifecycle, withHandlers, withStateHandlers } from 'recompose'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import { stringify } from 'query-string'
+import axios from 'axios'
 
 import { Order } from '../types'
 import ProductList from '../components/ProductList'
@@ -10,6 +11,7 @@ export type State = {
   allData: Order[]
   current: number
   dataSource: Order[]
+  isLoading: boolean
   selectedRowKeys: string[]
   selectedData: Order[]
 }
@@ -26,6 +28,7 @@ const State = withStateHandlers<State, StateUpdates>(
     allData: [],
     current: 1,
     dataSource: [],
+    isLoading: true,
     selectedData: [],
     selectedRowKeys: [],
   },
@@ -55,6 +58,7 @@ const State = withStateHandlers<State, StateUpdates>(
     reciveData: () => (dataSource: Order[]) => ({
       allData: dataSource,
       dataSource,
+      isLoading: false,
     }),
     changeCurrentPage: () => current => ({ current }),
   }
@@ -70,20 +74,87 @@ const Handlers = withHandlers<HandlersProps, {}>({
     })
   },
   pushToEditPage: ({ history }) => (id: string) => {
-    history.push(`product/edit/${id}`)
+    history.push(`/product/edit/${id}`)
   },
   changeProductStatus: () => (id: string, productStatus: string) => {
     set(`orders/${id}`, { productStatus })
   },
-  changeDepositStatus: () => (id: string, depositStatus: string) => {
-    set(`orders/${id}`, { depositStatus })
-  },
-  onSendProduct: () => (
+  changeDepositStatus: () => async (
     id: string,
-    shipmentNumber: number,
-    shipmentStatus: string
+    depositStatus: string,
+    mail: string,
+    address: string,
+    userName: string,
+    orderDate: string,
+    products: any,
+    price: number
   ) => {
-    set(`orders/${id}`, { shipmentNumber, shipmentStatus })
+    await set(`orders/${id}`, { depositStatus })
+    let productDescription: any = ''
+    Object.keys(products).map((key: string) => {
+      productDescription += `${key} : ${products[key]}個<br>`
+    })
+
+    axios
+      .get(
+        `https://imaimodels-mail-fetcher.herokuapp.com/api/v1/deposit/${mail}/${userName}/${address}/${orderDate.replace(
+          /\//g,
+          '-'
+        )}/${productDescription}/${price}`
+      )
+      .then(() => {})
+      .catch(err => new Error(err))
+  },
+  onSendWarningMessage: () => async (
+    id: string,
+    depositStatus: string,
+    mail: string,
+    address: string,
+    userName: string,
+    orderDate: string,
+    products: any,
+    price: number
+  ) => {
+    let productDescription: any = ''
+    Object.keys(products).map((key: string) => {
+      productDescription += `${key} : ${products[key]}個<br>`
+    })
+
+    axios
+      .get(
+        `https://imaimodels-mail-fetcher.herokuapp.com/api/v1/deposit-warning/${mail}/${userName}/${address}/${orderDate.replace(
+          /\//g,
+          '-'
+        )}/${productDescription}/${price}`
+      )
+      .then(() => {})
+      .catch(err => new Error(err))
+  },
+  onSendProduct: () => async ({
+    id,
+    shipmentNumber,
+    shipmentStatus,
+    mail,
+    userName,
+    address,
+    products,
+    orderDate,
+    price,
+  }: any) => {
+    await set(`orders/${id}`, { shipmentNumber, shipmentStatus })
+    let productDescription: any = ''
+    Object.keys(products).map((key: string) => {
+      productDescription += `${key} : ${products[key]}個<br>`
+    })
+    axios
+      .get(
+        `https://imaimodels-mail-fetcher.herokuapp.com/api/v1/sent-shipment/${mail}/${userName}/${address}/${orderDate.replace(
+          /\//g,
+          '-'
+        )}/${productDescription}/${price}/${shipmentNumber}`
+      )
+      .then(() => {})
+      .catch(err => new Error(err))
   },
   done: () => (id: string) => {
     set(`orders/${id}`, { doneProduct: true })

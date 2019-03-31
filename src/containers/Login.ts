@@ -6,11 +6,13 @@ import { signIn } from '../firebase/auth'
 
 export type State = {
   email: string
+  isLoading: boolean
   pass: string
 }
 
 const Handlers = withHandlers<RouteComponentProps & State, {}>({
-  signIn: ({ email, pass, history }) => () => {
+  clickSignIn: ({ history, loading, email, pass }: any) => () => {
+    loading()
     signIn(email, pass).then(() => {
       history.push('/products/1')
     })
@@ -19,12 +21,14 @@ const Handlers = withHandlers<RouteComponentProps & State, {}>({
 
 export type StateUpdates = {
   onChangeState: ({ key, value }: { key: string; value: string }) => Object
+  loading: () => Object
 }
 
 const StateHandlers = withStateHandlers<State, StateUpdates>(
-  { email: '', pass: '' },
+  { email: '', isLoading: false, pass: '' },
   {
     onChangeState: () => ({ key, value }) => ({ [key]: value }),
+    loading: () => () => ({ isLoading: true }),
   }
 )
 
