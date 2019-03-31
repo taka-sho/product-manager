@@ -1,24 +1,39 @@
 import firebase from './'
 import 'firebase/database'
 
-export function set (path: string, data: object) {  
-  return firebase.database().ref(path).update(data)
+export const set = (path: string, data: object) => {
+  return firebase
+    .database()
+    .ref(path)
+    .update(data)
 }
 
-export function push (path: string, data: any) {
-  return firebase.database().ref(path).push(data)
+export const push = (path: string, data: any) => {
+  return firebase
+    .database()
+    .ref(path)
+    .push(data)
 }
 
-export function read (path: string) {
-  return firebase.database().ref(path).once('value')
+export const read = (path: string) => {
+  return firebase
+    .database()
+    .ref(path)
+    .once('value')
 }
 
-export function listenStart (path: string) {
-  return firebase.database().ref(path).on('value', (snapshot: any) => {
-    return snapshot.val()
-  })
+export const listenStart = (path: string, cb: Function) => {
+  firebase
+    .database()
+    .ref(path)
+    .on('value', (snapshot: any) => {
+      cb(snapshot.val())
+    })
 }
 
-export function remove (path: string) {
-  return firebase.database().ref(path).remove()
+export const remove = (path: string) => {
+  return firebase
+    .database()
+    .ref(path)
+    .remove()
 }
